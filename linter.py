@@ -61,6 +61,9 @@ class Rust(Linter):
         self.use_crate_root = self.get_view_settings().get('use-crate-root',
                                                            False)
 
+        lint_env = os.environ
+        lint_env['CARGO_TARGET_DIR'] = 'target/sublimelint'
+
         if self.use_cargo or self.use_cargo_check:
             cargo_cmd = ['check'] if self.use_cargo_check else self.cmd
 
@@ -78,7 +81,7 @@ class Rust(Linter):
                                                  self.cargo_config],
                         code=None,
                         output_stream=self.error_stream,
-                        env=self.env)
+                        env=lint_env)
                 finally:
                     os.chdir(old_cwd)
 
@@ -92,7 +95,7 @@ class Rust(Linter):
                 return util.communicate(cmd,
                                         code=None,
                                         output_stream=self.error_stream,
-                                        env=self.env)
+                                        env=lint_env)
 
         self.tempfile_suffix = 'rs'
         return self.tmpfile(cmd, code)
